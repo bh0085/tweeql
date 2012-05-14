@@ -1,0 +1,28 @@
+# this class will take as input a list of words we want it to be able to handle, and the name of this word set
+# it will do some computation, save stuff to pickle, unless the information for that word set is already available, in which case it will just read in that info
+
+class gets_synonym:
+
+    pickle_directory = './pickles/'
+
+    def __init__(self, word_list, word_list_name):
+        pass
+
+    def get_synonym(self, entity):
+        pass
+
+    def get_pickle_name(self, word_list_name):
+        return gets_synonym.pickle_directory + self.word_list_name + '.info.pickle'
+        
+
+class freebase_gets_synonym(gets_synonym):
+
+    def __init__(self, word_set, word_list_name):
+        self.word_list_name = word_list_name
+        try:
+            self.info = pickle.load(open(self.get_pickle_name,'rb'))
+        except:
+            self.get_info()
+
+    def get_info(self):
+        #for each 

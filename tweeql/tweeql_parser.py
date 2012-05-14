@@ -5,6 +5,7 @@ from pyparsing import Literal, CaselessLiteral, Word, upcaseTokens, delimitedLis
     Combine, Group, alphas, nums, alphanums, ParseException, Forward, oneOf, quotedString, \
     ZeroOrMore, restOfLine, Keyword, removeQuotes, downcaseTokens
 from tweeql.query import QueryTokens
+import pdb
 
 def gen_parser():
     # define SQL tokens
@@ -12,6 +13,7 @@ def gen_parser():
     selectToken = Keyword(QueryTokens.SELECT, caseless=True)
     fromToken   = Keyword(QueryTokens.FROM, caseless=True)
     intoToken   = Keyword(QueryTokens.INTO, caseless=True)
+    pdb.set_trace()
     groupByToken   = Keyword(QueryTokens.GROUPBY, caseless=True)
     windowToken   = Keyword(QueryTokens.WINDOW, caseless=True)
     asToken = Keyword(QueryTokens.AS, caseless=True).setParseAction(upcaseTokens)
@@ -53,7 +55,7 @@ def gen_parser():
     tableToken = Keyword(QueryTokens.TABLE, caseless=True).setParseAction(upcaseTokens)
     streamToken = Keyword(QueryTokens.STREAM, caseless=True).setParseAction(upcaseTokens)
     intoLocation = stdoutToken | ( tableToken + ident ) | ( streamToken + ident ) 
-
+    pdb.set_trace()
     whereExpression = Forward()
     and_ = Keyword(QueryTokens.AND, caseless=True).setParseAction(upcaseTokens)
     or_ = Keyword(QueryTokens.OR, caseless=True).setParseAction(upcaseTokens)
