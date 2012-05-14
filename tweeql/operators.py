@@ -11,7 +11,7 @@ class StatusSource(object):
     saved_streams = dict()
     @staticmethod
     def has_saved_stream(stream_name):
-        pdb.set_trace()
+        #pdb.set_trace()
         return stream_name in StatusSource.saved_streams.keys()
     @staticmethod
     def get_saved_stream(stream_name):
