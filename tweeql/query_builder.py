@@ -41,7 +41,7 @@ class QueryBuilder:
             parsed = self.parser.parseString(query_str)
         except ParseException,e:
             raise QueryException(e)
-        pdb.set_trace()
+        #pdb.set_trace()
         source = self.__get_source(parsed)
         tree = self.__get_tree(parsed)
         handler = self.__get_handler(parsed)
