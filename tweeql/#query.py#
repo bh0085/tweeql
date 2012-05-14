@@ -21,7 +21,7 @@ class QueryTokens:
     OR = "OR"
     CONTAINS = "CONTAINS"
     ECONTAINS = "ECONTAINS"
-    AS = "AS"
+    AS = "AS"t
     IN = "IN"
     AVG = "AVG"
     COUNT = "COUNT"

@@ -117,6 +117,9 @@ class QueryBuilder:
         if len(clause) == 3 and clause[1] == QueryTokens.CONTAINS:
             alias = self.__where_field(clause[0], where_fields)
             return operators.Contains(alias, self.__parse_rval(clause[2], allow_null=False))
+        elif len(clause) == 3 and clause [1] == QueryTokens.ECONTAINS:
+            alias = self.__where_field(clause[0], where_fields)
+            return operators.ExpandedContains(alias, self.__parse_rval(clause[2], allow_null=False))
         elif len(clause) == 3 and ((clause[1] == QueryTokens.EQUALS) or (clause[1] == QueryTokens.DOUBLE_EQUALS)):
             alias = self.__where_field(clause[0], where_fields)
             return operators.Equals(alias, self.__parse_rval(clause[2], allow_null=True))

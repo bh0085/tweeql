@@ -9,12 +9,9 @@ import readline
 
 def main():
     runner = QueryRunner()
-    try:
-        while True:
-            cmd = raw_input("tweeql> ");
-            process_command(runner, cmd)
-    except KeyboardInterrupt:
-        print '\nGoodbye!'
+    cmd = "SELECT text FROM twitter_sample WHERE text ECONTAINS 'hey' OR text ECONTAINS 'hello'"
+    process_command(runner, cmd)
+    
 
 def process_command(runner, cmd):
     try:

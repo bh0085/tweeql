@@ -19,7 +19,7 @@ def gen_parser():
     
     # Math operators
     E = CaselessLiteral("E")
-    binop = oneOf("= != < > >= <= == eq ne lt le gt ge %s" % (QueryTokens.CONTAINS), caseless=True).setParseAction(upcaseTokens)
+    binop = oneOf("= != < > >= <= == eq ne lt le gt ge %s %s" % (QueryTokens.CONTAINS, QueryTokens.ECONTAINS), caseless=True).setParseAction(upcaseTokens)
     arithSign = Word("+-",exact=1)
     realNum = Combine( Optional(arithSign) + ( Word( nums ) + "." + Optional( Word(nums) )  |
                 ( "." + Word(nums) ) ) + 
