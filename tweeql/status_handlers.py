@@ -4,6 +4,7 @@ from tweeql.exceptions import SettingsException
 from tweeql.settings_loader import get_settings
 from sqlalchemy import create_engine, Table, Column, Integer, Unicode, Float, DateTime, MetaData
 from sqlalchemy.exc import ArgumentError, InterfaceError
+from operators import StatusSource
 
 settings = get_settings()
 
@@ -108,3 +109,16 @@ class DbInsertStatusHandler(StatusHandler):
         conn.execute(self.table.insert(), dicts)
         conn.close()
         #print "handle started ", now, " ended ", datetime.now()
+
+class SavedStreamStatusHandler(StatusHandler):
+
+    def __init__(self, batch_size, stream_name):
+        super(SavedStreamStatusHandler, self).__init__(batch_size)
+        self.stream_name = stream_name
+        StatusSource.add_saved_stream(stream_name)
+
+    def handle_statuses(self, statuses):
+        # add statuses to the dump in StatusSource
+        for status in statuses:
+            StatusSource.add_tuple_to_saved_stream(status, self.stream_name)
+            

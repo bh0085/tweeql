@@ -11,6 +11,7 @@ from threading import Thread
 from tweepy import Stream
 from tweepy import StreamListener
 from tweepy.auth import BasicAuthHandler
+from tweeql.saved_stream import SavedStream
 
 import time
 
@@ -42,10 +43,11 @@ class QueryRunner(StreamListener):
                              retry_time = 10.0, # wait 10s if no HTTP 200
                              snooze_time = 1.0) # wait 1s if timeout in 600s
     def run_built_query(self, query_built, async):
-        self.build_stream()
+        #self.build_stream() FULTON
         self.query = query_built
         self.query.handler.set_tuple_descriptor(self.query.get_tuple_descriptor())
         if self.query.source == StatusSource.TWITTER_FILTER:
+            self.build_stream() #FULTON
             no_filter_exception = QueryException("You haven't specified any filters that can query Twitter.  Perhaps you want to query TWITTER_SAMPLE?")
             try:
                 (follow_ids, track_words) = self.query.query_tree.filter_params()
@@ -55,8 +57,13 @@ class QueryRunner(StreamListener):
             except NotImplementedError:
                 raise no_filter_exception
         elif self.query.source == StatusSource.TWITTER_SAMPLE:
+            self.build_stream() # FULTON
             self.stream.sample(None, async)
+        elif StatusSource.has_saved_stream(self.query.source): #FULTON
+            self.stream = SavedStream(self, self.query.source)
+            self.stream.iterate()
     def run_query(self, query_str, async):
+        
         if isinstance(query_str, str):
             query_str = unicode(query_str, 'utf-8')
         query_built = self.query_builder.build(query_str)
