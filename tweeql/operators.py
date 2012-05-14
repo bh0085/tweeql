@@ -3,9 +3,25 @@ from field_descriptor import FieldDescriptor
 from query import QueryTokens
 from twitter_fields import TwitterFields
 
+import pdb
+
 class StatusSource(object):
     TWITTER_FILTER = 1
     TWITTER_SAMPLE = 2
+    saved_streams = dict()
+    @staticmethod
+    def has_saved_stream(stream_name):
+        pdb.set_trace()
+        return stream_name in StatusSource.saved_streams.keys()
+    @staticmethod
+    def get_saved_stream(stream_name):
+        return StatusSource.saved_streams[stream_name]
+    @staticmethod
+    def add_saved_stream(stream_name):
+        StatusSource.saved_streams[stream_name] = []
+    @staticmethod
+    def add_tuple_to_saved_stream(tuple, stream_name):
+        StatusSource.saved_streams[stream_name].append(tuple)
 
 class QueryOperator(object):
     """

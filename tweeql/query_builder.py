@@ -14,8 +14,11 @@ from tweeql.query import QueryTokens
 from tweeql.tweeql_parser import gen_parser
 from tweeql.status_handlers import PrintStatusHandler
 from tweeql.status_handlers import DbInsertStatusHandler
+from tweeql.status_handlers import SavedStreamStatusHandler
 from tweeql.tuple_descriptor import TupleDescriptor
 from tweeql.twitter_fields import twitter_tuple_descriptor
+
+import pdb
 
 def gen_query_builder():
     return QueryBuilder()
@@ -38,7 +41,7 @@ class QueryBuilder:
             parsed = self.parser.parseString(query_str)
         except ParseException,e:
             raise QueryException(e)
-
+        pdb.set_trace()
         source = self.__get_source(parsed)
         tree = self.__get_tree(parsed)
         handler = self.__get_handler(parsed)
@@ -50,6 +53,8 @@ class QueryBuilder:
             return StatusSource.TWITTER_FILTER
         elif source.startswith(QueryTokens.TWITTER_SAMPLE):
             return StatusSource.TWITTER_SAMPLE
+        elif StatusSource.has_saved_stream(source):
+            return source #FULTON
         else:
             raise QueryException('Unknown query source: %s' % (source))
     def __get_tree(self, parsed):
@@ -64,12 +69,19 @@ class QueryBuilder:
     def __get_handler(self, parsed):
         into = parsed.into.asList()
         handler = None
+        print 'FFFFFFFFFFFFFFFF'
+        print into
+        print 'GGGGGGGGGGGGGGG'
+        pdb.set_trace()
+        #print erera
         if (into == ['']) or (into[1] == QueryTokens.STDOUT):
             handler = PrintStatusHandler(1)
+            #handler = SavedStreamStatusHandler(1000, 'ASDF')
         elif (len(into) == 3) and (into[1] == QueryTokens.TABLE):
             handler = DbInsertStatusHandler(1000, into[2])
         elif (len(into) == 3) and (into[1] == QueryTokens.STREAM):
-            raise DbException("Putting results into a STREAM is not yet supported")
+            handler = SavedStreamStatusHandler(1000, into[2])
+            #raise DbException("Putting results into a STREAM is not yet supported")
         else:
             raise QueryException("Invalid INTO clause")
         return handler
