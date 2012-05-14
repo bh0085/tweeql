@@ -72,7 +72,7 @@ class QueryBuilder:
         print 'FFFFFFFFFFFFFFFF'
         print into
         print 'GGGGGGGGGGGGGGG'
-        pdb.set_trace()
+        #pdb.set_trace()
         #print erera
         if (into == ['']) or (into[1] == QueryTokens.STDOUT):
             handler = PrintStatusHandler(1)
