@@ -6,6 +6,8 @@ from sqlalchemy import create_engine, Table, Column, Integer, Unicode, Float, Da
 from sqlalchemy.exc import ArgumentError, InterfaceError
 from operators import StatusSource
 
+import pdb
+
 settings = get_settings()
 
 class StatusHandler(object):
@@ -25,7 +27,7 @@ class PrintStatusHandler(StatusHandler):
         td = self.tuple_descriptor
         for status in statuses:
             vals = (unicode(val) for (alias, val) in status.as_iterable_visible_pairs())
-            print self.delimiter.join(vals) + "\n"
+            print '- ',self.delimiter.join(vals) + "\n"
 
 class DbInsertStatusHandler(StatusHandler):
     engine = None
@@ -122,3 +124,27 @@ class SavedStreamStatusHandler(StatusHandler):
         for status in statuses:
             StatusSource.add_tuple_to_saved_stream(status, self.stream_name)
             
+class ToStreamStatusHandler(StatusHandler):
+
+    def __init__(self, batch_size, name):
+        super(ToStreamStatusHandler, self).__init__(batch_size)
+        self.clients = set()
+        #pdb.set_trace()
+        StatusSource.register_saved_stream(name, self)
+    
+    # client is a stream_from_stream
+    def register(self, client):
+        #pdb.set_trace()
+        print 'registered ', client, ' as client of ', self
+        self.clients.add(client)
+        #pdb.set_trace()
+
+    def unregister(self, client):
+        self.clients.remove(client)
+
+    def handle_statuses(self, statuses):
+        print 'handling statuses: ', self
+
+        for client in self.clients:
+            # send statuses to stream_from_stream
+            client.accept_statuses(statuses)

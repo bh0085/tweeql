@@ -89,6 +89,7 @@ class QueryBuilder:
         elif (len(into) == 3) and (into[1] == QueryTokens.TABLE):
             handler = DbInsertStatusHandler(1000, into[2])
         elif (len(into) == 3) and (into[1] == QueryTokens.STREAM):
+            if source != 
             handler = ToStreamStatusHandler(1000, into[2])
             # FULTONMORNING at this point the handler has been registered in global directory of handlers so 
             # streams that refer to it as a source can register themselves as clients

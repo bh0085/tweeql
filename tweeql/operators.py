@@ -8,20 +8,21 @@ import pdb
 class StatusSource(object):
     TWITTER_FILTER = 1
     TWITTER_SAMPLE = 2
-    saved_streams = dict()
+    # mapping from stream name to stream_status_handler
+    saved_status_handlers = dict()
     @staticmethod
-    def has_saved_stream(stream_name):
-        #pdb.set_trace()
-        return stream_name in StatusSource.saved_streams.keys()
+    def has_saved_stream(handler_name):
+        return handler_name in StatusSource.saved_status_handlers.keys()
     @staticmethod
-    def get_saved_stream(stream_name):
-        return StatusSource.saved_streams[stream_name]
+    def get_saved_stream(handler_name):
+        return StatusSource.saved_status_handlers[handler_name]
     @staticmethod
-    def add_saved_stream(stream_name):
-        StatusSource.saved_streams[stream_name] = []
+    def register_saved_stream(handler_name, stream_status_handler):
+        StatusSource.saved_status_handlers[handler_name] = stream_status_handler
     @staticmethod
-    def add_tuple_to_saved_stream(tuple, stream_name):
-        StatusSource.saved_streams[stream_name].append(tuple)
+    def unregister_saved_stream(handler_name):
+        pass
+    
 
 class QueryOperator(object):
     """
