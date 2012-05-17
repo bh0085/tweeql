@@ -12,9 +12,15 @@ Made a few modifications that added the econtains operator and allowed database 
 
 Added python scripts to query freebasea and to enable the econtains operator.
 
-*freebase_lists.py*
+*tweeql_econtains.py* - functions called directly by the econtains opertor. SetAliases() and GetAliases().
 
-*freebase_utils.py*
+*freebase_lists.py* - lists and a few functions powering built-in ECONTAINS types.
+
+*freebase_utils.py* - generic funtions to allow write, rewrite and access of econtains (type:key) pairs.
+
+*make_metanym.py* - shell script allows the user to create an econtains type/key combination. Calls tweeql_econstains.setAliasesIfNeeded(). Note that operators.ECONTAINS will call this automatically so this script is only around for testing purposes.
+
+*get_metanym.py* - shell script allows the user to check the aliases stored for a metanym (type:key) pair. Returns a list of aliases.
 
 ##tweeql/econtains/plugin_examples/*##
 
