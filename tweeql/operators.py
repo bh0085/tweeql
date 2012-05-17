@@ -219,23 +219,19 @@ class Contains(QueryOperator):
 
 class ExpandedContains(Or):
     """
-        Passes updates which contain the desired term.  Matching is case-insensitive.
+        Passes updates which contain  aliases of the desired term.  Matching is case-insensitive.
     """
     def __init__(self, field_alias, term):
         import re        
         import synql.scripts.tweeql_econtains as tw_econtains
+        
+        #in case we haven't yet computed aliases for a search term, 
+        #do so.
+        tw_econtains.setAliasesIfNeeded(term, reset = False)
         aliases = tw_econtains.getAliases(term)
-    
-        if 'person' in term:
-            children = [Contains('text', '{0}'.format(e.lower())) 
-                        for a in aliases[:] 
-                        for e in re.compile('\s+').split(a)] 
-            
-        else:
-            children = [Contains('text', '{0}'.format(a.lower())) 
-                        for a in aliases[:]]   
-
-        print aliases, children
+        ectype, key = idstring.split(':')[0], ':'.join(idstring.split(':')[1:])
+        children = [Contains('text', '{0}'.format(a.lower())) 
+                    for a in aliases[:]]   
         Or.__init__(self,children)
         self.alias = field_alias
         self.term = term.lower()
