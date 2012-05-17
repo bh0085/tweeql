@@ -222,32 +222,23 @@ class ExpandedContains(Or):
         Passes updates which contain the desired term.  Matching is case-insensitive.
     """
     def __init__(self, field_alias, term):
-        print field_alias
-        children = [Contains('text', 'whatever'),
-                    Contains('text', 'nothing')]
+        import re        
+        import synql.scripts.tweeql_econtains as tw_econtains
+        aliases = tw_econtains.getAliases(term)
+    
+        if 'person' in term:
+            children = [Contains('text', '{0}'.format(e.lower())) 
+                        for a in aliases[:] 
+                        for e in re.compile('\s+').split(a)] 
+            
+        else:
+            children = [Contains('text', '{0}'.format(a.lower())) 
+                        for a in aliases[:]]   
+
+        print aliases, children
         Or.__init__(self,children)
         self.alias = field_alias
         self.term = term.lower()
-#    def filter(self, updates, return_passes, return_fails):
-#        passes = [] if return_passes else None
-#        fails = [] if return_fails else None
-#        for update in updates:
-#            update.set_tuple_descriptor(self.tuple_descriptor)
-#            if self.term in getattr(update, self.alias).lower():
-#                if return_passes:
-#                    passes.append(update)
-#            elif return_fails:
-#                fails.append(update)
-#        return (passes, fails)
-#    def filter_params(self):
-#        return (None, [self.term])
-#    def can_query_stream(self):
-#        if self.alias == TwitterFields.TEXT:
-#            return True
-#        else:
-#            return False
-#    def assign_descriptor(self, tuple_descriptor):
-#        self.tuple_descriptor = tuple_descriptor
 
 class Equals(QueryOperator):
     """

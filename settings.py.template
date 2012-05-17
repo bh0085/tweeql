@@ -15,6 +15,12 @@ DATABASE_URI = "sqlite:///test.db"
 #    'password':''
 #}
 
+#add a parameter for the batch size of database writes so that the synql
+#web server can stream sparse queries from the DB
+DATABASE_BATCHSIZE = 1000
+#specify a directory for ECONTAINS to store tweets
+ECONTAINS_DATADIR = '/data/econtains'
+
 # Running in debug mode, the system prints a lot more information
 DEBUG = False
 

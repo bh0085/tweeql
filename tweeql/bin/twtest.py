@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 from tweeql.exceptions import TweeQLException
 from tweeql.query_runner import QueryRunner
 
@@ -7,9 +6,14 @@ import settings
 import traceback
 import readline
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 def main():
+
+    args = sys.argv[1:]
     runner = QueryRunner()
-    cmd = "SELECT text FROM twitter_sample WHERE text ECONTAINS 'hey' OR text ECONTAINS 'hello'"
+    cmd = "SELECT text FROM twitter WHERE text ECONTAINS 'person:Barack Obama';"
     process_command(runner, cmd)
     
 
