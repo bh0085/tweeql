@@ -29,4 +29,15 @@ Added python scripts to query freebasea and to enable the econtains operator.
 *tweeql-eavesdrop.py*: A script to run to eavesdrop on tweeql streams as they are written to a database table. Synql launches this with Popen() and then reads stdout in JSON format to update tweets. Arguably, this should be implemented via a socket/rpc with the server but this way seems a bit simpler.
 
 
+##settings.py##
+
+**EAVESDROPPING_COUNT** Controls batchsize of tweets broadcast to the stdout or a file.
+
+**EAVESDROPPING_DELAY** Repeat delay betwen batch broadcasts.
+
+**ECONTAINS_DATADIR** Directory to save ECONTAINS alias dictionaries to. Must be writable.
+
+**ECONTAINS_TYPE_EXTENSIONS** Allows user provided extensions to ECONTAINS semantics.
+
+**DATABASE_BATCHSIZE** Control size of tweet batches written to the database.
 
