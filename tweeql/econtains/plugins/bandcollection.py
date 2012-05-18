@@ -2,16 +2,22 @@
 Demonstrates an econtains type explicity enumerating allowed values.
 '''
 
+
+from apiclient import discovery
+from apiclient import model
+from everySNAKE.utils import memo as mem
+import json
 DEVELOPER_KEY = 'AIzaSyDGJapkaTMy09-nS96huqzdX4ftUCTJxwA'
 
 def allowedBandCollectionNames():
     return band_collectionnames.keys()
 
 def getBandCollectionAliases(**kwargs):
-    def setBandCollectionAliases(**kwargs):
+    def setBandCollectionAliases(name = None, **kwargs):
+        assert name != None
         all_aliases = []
 	freebase = discovery.build('freebase', 'v1', developerKey=DEVELOPER_KEY)
-        names_key = kwargs.get('list', 'sample')
+        names_key = name
         names_list = band_collectionnames[names_key]
         for n in names_list:
             q = [{
@@ -39,7 +45,7 @@ def getBandCollectionAliases(**kwargs):
         return all_aliases
 
         
-    name = 'demo{0}'.format(kwargs.get('list',''))
+    name = kwargs['name']
     return mem.getOrSet(setBandCollectionAliases, **mem.rc(kwargs,
                                                            name = name))
 
@@ -89,5 +95,4 @@ band_collectionnames = {
     'recent':recent_bandnames,
     'bonnaroo':bonnaroo_bandnames,
     'billboard':billboard_bandnames,
-    'sample':sample_bandnames
     }

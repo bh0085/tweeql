@@ -4,6 +4,9 @@ Demonstrates a type having a very simple freebase caller.
 Takes "name". Searches freebase, returns a list of all aliases
 for all bands matching "name".
 '''
+
+from apiclient import discovery
+from apiclient import model
 from everySNAKE.utils import memo as mem
 DEVELOPER_KEY = 'AIzaSyDGJapkaTMy09-nS96huqzdX4ftUCTJxwA'
 

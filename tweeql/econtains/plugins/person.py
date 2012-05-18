@@ -7,6 +7,9 @@ to find nicknames for a person, the user may provide a name
 or an explicit mid.
 '''
 
+
+from apiclient import discovery
+from apiclient import model
 from everySNAKE.utils import memo as mem
 DEVELOPER_KEY = 'AIzaSyDGJapkaTMy09-nS96huqzdX4ftUCTJxwA'
 

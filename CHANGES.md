@@ -27,6 +27,10 @@ Added python scripts to query freebasea and to enable the econtains operator.
 
 *bandcollection.py* Allows the user to select a collection of bands from a preset list of options, bonnaroo, top100, etc. For each member of the list, generates a list f aliases (the same way as `band.py`, above), yields the union of all such lists over the collection.
 
+**note** for "bandcollection" to work, there is a dependency on memo.py, a script that I keep in _github.com/bh0085/everySNAKE_. I should put everySNAKE on pip but its not there yet (and mostly useless); by default I don't include bandcollection in the set of enabled plugins for this reason.  
+
+**TODO**
+
 *movies.py* A slightly smarter example: how a user might implement a custom type that crawled freebase to find aliases for a movie and participant actors and/or its directors.
 
 ##tweeql/bin/*##
