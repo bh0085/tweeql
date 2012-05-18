@@ -223,13 +223,13 @@ class ExpandedContains(Or):
     """
     def __init__(self, field_alias, term):
         import re        
-        import synql.scripts.tweeql_econtains as tw_econtains
+        import tweeql.econtains.tweeql_econtains as tw_econtains
         
         #in case we haven't yet computed aliases for a search term, 
         #do so.
         tw_econtains.setAliasesIfNeeded(term, reset = False)
         aliases = tw_econtains.getAliases(term)
-        ectype, key = idstring.split(':')[0], ':'.join(idstring.split(':')[1:])
+        ectype, key = term.split(':')[0], ':'.join(term.split(':')[1:])
         children = [Contains('text', '{0}'.format(a.lower())) 
                     for a in aliases[:]]   
         Or.__init__(self,children)

@@ -2,8 +2,8 @@ import freebase_utils as fbu
 import os, pickle
 from tweeql.settings_loader import get_settings
 settings = get_settings()
-econtains_data_root = settings.ECONTAINS_DATADIR if settings.__dict__.has_key('ECONTAINS_DATADIR') else '/data/econtains'
-econtains_type_extensions = settings.ECONTAINS_TYPE_EXTENSIONS if settings.___dict__.has_key('ECONTAINS_TYPE_EXTENSIONS') else {}
+econtains_data_root = settings.ECONTAINS_DATADIR if hasattr(settings,'ECONTAINS_DATADIR') else '/data/econtains'
+econtains_type_extensions = settings.ECONTAINS_TYPE_EXTENSIONS if hasattr(settings,'ECONTAINS_TYPE_EXTENSIONS') else {}
 
 def setAliasesIfNeeded(idstring, data = {}, reset = False):    
 

@@ -11,7 +11,7 @@ For command line usage, call:
 import argparse, json, time
 import sqlsoup
 from sqlalchemy import Table
-
+from sqlalchemy.exc import NoSuchTableError
 
 from tweeql.settings_loader import get_settings
 settings = get_settings()
@@ -26,18 +26,31 @@ def eavesdrop(table = None, output = None, recurs = False):
     Dump tweets in "table" to STDOUT of "file"
     '''
 
-    db = sqlsoup.SQLSoup("sqlite:///tweeql.db")
-    if table == None:
-        last_created = (-1, None)
-        #fix an apparent SQLSoup bug - sqlite_master lacks a primary key :(
-        sqm_table = Table("sqlite_master", db._metadata, autoload=True)
-        #read sqlite_master with tablename as the primary
-        for record in db.map(sqm_table, primary_key=[sqm_table.c.name]).all():
-            if record.rootpage > last_created[0] and record.type == 'table':
-                last_created = (record.rootpage, record.name)       
-        eavesdrop_table = db.entity(last_created[1])
-    else:
-        eavesdrop_table = db.entity(table)
+#    print dir(db)
+#    return
+
+    while 1:
+       try:
+           db = sqlsoup.SQLSoup(dburi)
+           if table == None:
+               last_created = (-1, None)
+           #fix an apparent SQLSoup bug - sqlite_master lacks a primary key :(
+               sqm_table = Table("sqlite_master", db._metadata, autoload=True)
+           #read sqlite_master with tablename as the primary
+               for record in db.map(sqm_table, primary_key=[sqm_table.c.name]).all():
+                   if record.rootpage > last_created[0] and record.type == 'table':
+                       last_created = (record.rootpage, record.name)  
+               if last_created[1] == None: raise NoSuchTableError()
+               eavesdrop_table = db.entity(last_created[1])
+           else:
+               eavesdrop_table = db.entity(table)
+       
+           break
+       except NoSuchTableError, e:
+           print 'waiting for table to be initialized'
+           print table
+           print e
+           time.sleep(1)
     
         
     while 1:

@@ -34,6 +34,7 @@ Added python scripts to query freebasea and to enable the econtains operator.
 
 *tweeql-eavesdrop.py*: A script to run to eavesdrop on tweeql streams as they are written to a database table. Synql launches this with Popen() and then reads stdout in JSON format to update tweets. Arguably, this should be implemented via a socket/rpc with the server but this way seems a bit simpler.
 
+Also, this could be built into tweeql but the idea is for it to be an asynchronous process from the tweet streaming itself - the webserver should be able to launch it choosing an output file, kill it, relaunch it etc without messing with an ongoing stream.
 
 ##settings.py##
 
