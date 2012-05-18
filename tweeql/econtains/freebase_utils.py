@@ -8,7 +8,6 @@ will be run or given selections.
 import json
 
 #note that we may never use band_collectionames
-from everySNAKE.utils import memo as mem
 
 DEVELOPER_KEY = 'AIzaSyDGJapkaTMy09-nS96huqzdX4ftUCTJxwA'
 
@@ -21,4 +20,4 @@ type_function_mapper.update(plugins.plugins_enabled)
 
 def fetch_type(typename, **kwargs):
     assert typename in type_function_mapper.keys()
-    return type_function_mapper[typename]['getter'](**mem.rc(kwargs))
+    return type_function_mapper[typename]['getter'](**kwargs)
