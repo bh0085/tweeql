@@ -80,15 +80,15 @@ class QueryBuilder:
     def __get_handler(self, parsed):
         into = parsed.into.asList()
         handler = None
-<<<<<<< HEAD
+
         #print 'FFFFFFFFFFFFFFFF'
         #print into
         #print 'GGGGGGGGGGGGGGG'
         #pdb.set_trace()
         #print erera
-=======
+
         batchsize = settings.DATABASE_BATCHSIZE if settings.__dict__.has_key('DATABASE_BATCHSIZE') else 1000
->>>>>>> ben/master
+
         if (into == ['']) or (into[1] == QueryTokens.STDOUT):
             handler = PrintStatusHandler(1)
             #handler = SavedStreamStatusHandler(1000, 'ASDF')

@@ -27,10 +27,6 @@ class PrintStatusHandler(StatusHandler):
     def handle_statuses(self, statuses):
         td = self.tuple_descriptor
         for status in statuses:
-<<<<<<< HEAD
-            vals = (unicode(val) for (alias, val) in status.as_iterable_visible_pairs())
-            print '- ',self.delimiter.join(vals) + "\n"
-=======
             vals = (unicode(val) for (alias, val) in status.as_iterable_visible_pairs())     
             #force the stdout to flush so that we can access streams
             #from python subprocess
@@ -38,7 +34,7 @@ class PrintStatusHandler(StatusHandler):
             print status
             sys.stdout.flush()
         
->>>>>>> ben/master
+
 
 class DbInsertStatusHandler(StatusHandler):
     engine = None
