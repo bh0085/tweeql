@@ -1,6 +1,7 @@
 from itertools import chain
 from pyparsing import ParseException
 from tweeql import operators
+from tweeql.settings_loader import get_settings
 from tweeql.aggregation import get_aggregate_factory
 from tweeql.operators import StatusSource
 from tweeql.exceptions import QueryException
@@ -18,6 +19,7 @@ from tweeql.status_handlers import ToStreamStatusHandler
 from tweeql.tuple_descriptor import TupleDescriptor
 from tweeql.twitter_fields import twitter_tuple_descriptor
 
+settings = get_settings()
 import pdb
 import time
 from tweeql.locks import locks
@@ -78,16 +80,20 @@ class QueryBuilder:
     def __get_handler(self, parsed):
         into = parsed.into.asList()
         handler = None
+<<<<<<< HEAD
         #print 'FFFFFFFFFFFFFFFF'
         #print into
         #print 'GGGGGGGGGGGGGGG'
         #pdb.set_trace()
         #print erera
+=======
+        batchsize = settings.DATABASE_BATCHSIZE if settings.__dict__.has_key('DATABASE_BATCHSIZE') else 1000
+>>>>>>> ben/master
         if (into == ['']) or (into[1] == QueryTokens.STDOUT):
             handler = PrintStatusHandler(1)
             #handler = SavedStreamStatusHandler(1000, 'ASDF')
         elif (len(into) == 3) and (into[1] == QueryTokens.TABLE):
-            handler = DbInsertStatusHandler(1000, into[2])
+            handler = DbInsertStatusHandler(batchsize, into[2])
         elif (len(into) == 3) and (into[1] == QueryTokens.STREAM):
             handler = ToStreamStatusHandler(1000, into[2])
             # FULTONMORNING at this point the handler has been registered in global directory of handlers so 

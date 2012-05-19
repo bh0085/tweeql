@@ -15,6 +15,21 @@ DATABASE_URI = "sqlite:///test.db"
 #    'password':''
 #}
 
+# batch size of database writes
+# smaller values allow the web server to "stream" sparse queries from the DB
+# DATABASE_BATCHSIZE = 20
+
+# specify a directory for ECONTAINS to store tweets
+# if you want to use ECONTAINS, you'll want to set this.
+ECONTAINS_DATADIR = '/data/econtains'
+
+# add any desired user-defined econtains extensions
+# ECONTAINS_TYPE_EXTENSIONS = {movies:'tweeql.econtains.extensions.movies'}
+
+# configure tweeql-eavesdrop.py - in case you want to run synQL web for example.
+EAVESDROPPING_COUNT = 100  # number of results to print per broadcast
+EAVESDROPPING_DELAY = 1    # delay between broadcasts
+
 # Running in debug mode, the system prints a lot more information
 DEBUG = False
 
