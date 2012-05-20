@@ -6,6 +6,7 @@ import threading
 import pdb
 from tweeql.operators import StatusSource
 from tweeql.locks import locks
+import logging
 
 # before running a query that sends into a stream, need to specify the name of the into_stream, and create a flag corresponding to it
 # if a query reads from a stream, then in build_query need to wait for the flag to be true
@@ -31,19 +32,25 @@ def run_query(q, to_stream, from_stream):
     qt.start()
     print q, 4
 
+try:
+    query1 = "SELECT text FROM twitter INTO STREAM STREAMONE WHERE text CONTAINS \"game\""
+    #query1 = "SELECT text FROM twitter WHERE text CONTAINS \"game\""
+    qr1 = QueryRunner()
+    qr1.run_query(query1, True)
 
-query1 = "SELECT text FROM twitter INTO STREAM ASDF WHERE text CONTAINS \"game\""
-#query1 = "SELECT text FROM twitter WHERE text CONTAINS \"game\""
-qr1 = QueryRunner()
-qr1.run_query(query1, False)
+    query2 = "SELECT text FROM STREAMONE INTO STREAM STREAMTWO WHERE text CONTAINS \"the\""
+    qr2 = QueryRunner()
+    qr2.run_query(query2, True)
+    print 'FINISHED TWOTWOTWOTWOTWO'
+    query3 = "SELECT text FROM STREAMTWO"
+    print 'RUNNING THRETHRETHREHTEHRHETHERHETHERHETHEHREHR'
+    qr3 = QueryRunner()
+    qr3.run_query(query3, True)
 
-query2 = "SELECT text FROM ASDF INTO STREAM ASDF2 WHERE text CONTAINS \"the\""
-qr2 = QueryRunner()
-qr2.run_query(query2, False)
-
-query3 = "SELECT text FROM ASDF2 WHERE text CONTAINS \"heat\""
-qr3 = QueryRunner()
-qr3.run_query(query3, False)
+except KeyboardInterrupt:
+    qr1.stop_query()
+    qr2.stop_query()
+    qr3.stop_query()
 
 """
 

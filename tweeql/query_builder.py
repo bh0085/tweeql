@@ -41,31 +41,32 @@ class QueryBuilder:
         """
             Takes a Unicode string query_str, and outputs a query tree
         """
-        print '\n'
-        print 'started building query: ', query_str
         try:
             parsed = self.parser.parseString(query_str)
         except ParseException,e:
             raise QueryException(e)
-        #pdb.set_trace()
         source = self.__get_source(parsed)
         tree = self.__get_tree(parsed)
         handler = self.__get_handler(parsed)
-        #time.sleep(1)
         query = Query(tree, source, handler)
-        print 'finished building: ', query_str, '\n'
         return query
     def __get_source(self, parsed):
-        #pdb.set_trace()
         source = parsed.sources[0]
+
         if source == QueryTokens.TWITTER:
             return StatusSource.TWITTER_FILTER
         elif source.startswith(QueryTokens.TWITTER_SAMPLE):
             return StatusSource.TWITTER_SAMPLE
-        elif StatusSource.has_saved_stream(source):
-            # FULTONMORNING if source is a stream, don't try to make its handler until its source is fully constructed
-            # so block here until source query is finished being constructed
-            return source #FULTON
+        elif source.startswith(QueryTokens.TABLE):
+            if StatusSource.table_exists(source):
+                return source
+            else:
+                raise DbException('table does not exist')
+        elif source.startswith(QueryTokens.STREAM):
+            if not StatusSource.has_saved_stream(source):
+                raise DbException('stream does not exist')
+            else:
+                return source
         else:
             raise QueryException('Unknown query source: %s' % (source))
     def __get_tree(self, parsed):
@@ -81,28 +82,15 @@ class QueryBuilder:
         into = parsed.into.asList()
         handler = None
 
-        #print 'FFFFFFFFFFFFFFFF'
-        #print into
-        #print 'GGGGGGGGGGGGGGG'
-        #pdb.set_trace()
-        #print erera
-
-        batchsize = settings.DATABASE_BATCHSIZE if settings.__dict__.has_key('DATABASE_BATCHSIZE') else 1000
-
+        db_batchsize = settings.DATABASE_BATCHSIZE if settings.__dict__.has_key('DATABASE_BATCHSIZE') else 1000
+        regular_batchsize = settings.REGULAR_BATCHSIZE if settings.__dict__.has_key('REGULAR_BATCHSIZE') else 10
+        
         if (into == ['']) or (into[1] == QueryTokens.STDOUT):
-            handler = PrintStatusHandler(1)
-            #handler = SavedStreamStatusHandler(1000, 'ASDF')
+            handler = PrintStatusHandler(regular_batchsize)
         elif (len(into) == 3) and (into[1] == QueryTokens.TABLE):
             handler = DbInsertStatusHandler(batchsize, into[2])
         elif (len(into) == 3) and (into[1] == QueryTokens.STREAM):
-            handler = ToStreamStatusHandler(1000, into[2])
-            # FULTONMORNING at this point the handler has been registered in global directory of handlers so 
-            # streams that refer to it as a source can register themselves as clients
-            # so change flag to true here indicating that handler has been made
-            #time.sleep(1) FULTONLOCKS
-            #locks.locks[into[2]].set()
-            
-            #raise DbException("Putting results into a STREAM is not yet supported")
+            handler = ToStreamStatusHandler(regular_batchsize, into[2])
         else:
             raise QueryException("Invalid INTO clause")
         return handler

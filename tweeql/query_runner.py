@@ -11,12 +11,14 @@ from threading import Thread
 from tweepy import Stream
 from tweepy import StreamListener
 from tweepy.auth import BasicAuthHandler
-from tweeql.saved_stream import SavedStream
-from tweeql.stream_from_stream import StreamFromStream
+#from tweeql.saved_stream import SavedStream
+from tweeql.stream_from_stream import StreamFromStream, StreamFromDB
+import sys
 import pdb
 
 import time
 from locks import locks
+from tweeql.query import QueryTokens
 
 settings = get_settings()
 
@@ -35,6 +37,8 @@ class QueryRunner(StreamListener):
         self.statuses = []
         self.query_builder = gen_query_builder()
         self.stream = None
+        # initializing database engine - could have done this anywhere. do it here for now
+        StatusSource.set_engine()
 
     def build_stream(self):
         if self.stream != None:
@@ -47,70 +51,52 @@ class QueryRunner(StreamListener):
                              retry_time = 10.0, # wait 10s if no HTTP 200
                              snooze_time = 1.0) # wait 1s if timeout in 600s
     def run_built_query(self, query_built, async):
-        #self.build_stream() FULTON
-        
-        #pdb.set_trace()
         self.query = query_built
-        #print 'CHOOSING THE SOURCE!!!', self.query.source
-        #print StatusSource.saved_status_handlers
         self.query.handler.set_tuple_descriptor(self.query.get_tuple_descriptor())
+        
         if self.query.source == StatusSource.TWITTER_FILTER:
-            self.build_stream() #FULTON
+            self.build_stream() 
             no_filter_exception = QueryException("You haven't specified any filters that can query Twitter.  Perhaps you want to query TWITTER_SAMPLE?")
             try:
                 (follow_ids, track_words) = self.query.query_tree.filter_params()
+                sys.stdout.flush()
                 if (follow_ids == None) and (track_words == [None]):
                     raise no_filter_exception
                 self.stream.filter(follow_ids, track_words, async)
             except NotImplementedError:
                 raise no_filter_exception
         elif self.query.source == StatusSource.TWITTER_SAMPLE:
-            self.build_stream() # FULTON
-            #locks.lock1.set()
-            #time.sleep(1)
+            self.build_stream() 
             self.stream.sample(None, async)
-        elif StatusSource.has_saved_stream(self.query.source): #FULTON
-            print self, ' created stream with source stream ', self.query.source
+        elif self.query.source.startswith(QueryTokens.TABLE):
+            self.stream = StreamFromDB(self, self.query.source)
+            self.stream.read_from_table(async)
+        elif self.query.source.startswith(QueryTokens.STREAM):
             self.stream = StreamFromStream(self, self.query.source)
-            
-            self.stream.fetch()
-        #print 'FFFFFF'
-        #print self.query.source
+            self.stream.fetch(async)
     def run_query(self, query_str, async):
-        #time.sleep(5)
         if isinstance(query_str, str):
             query_str = unicode(query_str, 'utf-8')
         query_built = self.query_builder.build(query_str)
-        # FULTON run query in new thread.  this ensures that all of the building is run on the same thread
-        # there are only time dependences between steps in build, so putting builds on same thread enforces them
-        run_func = lambda q=query_built, a=async: self.run_built_query(q,a)
-        t = Thread(target = run_func)
-        t.start()
-        #self.run_built_query(query_built, async)
+        self.run_built_query(query_built, async)
     def stop_query(self):
         if self.stream != None:
             self.stream.disconnect()
             self.flush_statuses()
     def filter_statuses(self, statuses, query):
         (passes, fails) = query.query_tree.filter(statuses, True, False)
-        #print self
         query.handler.handle_statuses(passes)
     def flush_statuses(self):
         self.status_lock.acquire()
         if len(self.statuses) > 0:
             filter_func = lambda s=self.statuses, q=self.query: self.filter_statuses(s,q)
             t = Thread(target = filter_func)
-            #pdb.set_trace()
             t.start()
-            #pdb.set_trace()
             self.statuses = []
         self.status_lock.release()
 
     """ StreamListener methods """
     def on_status(self, status):
-        #print self.query.source
-        #print self.query.handler
-        #print self.query.handler.clients
         self.status_lock.acquire()
         t = Tuple()
         t.set_tuple_descriptor(None)

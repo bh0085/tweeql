@@ -7,6 +7,7 @@ import settings
 import traceback
 import readline
 
+
 def main():
 
     try:
@@ -19,8 +20,10 @@ def main():
 def process_command(cmd):
     runner = QueryRunner()
     try:
+        logging.debug('starting')
         runner.run_query(cmd, False)
     except KeyboardInterrupt:
+        logging.debug('interrupted')
         runner.stop_query()
     except TweeQLException, e:
         runner.stop_query()

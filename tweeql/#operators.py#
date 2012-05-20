@@ -30,7 +30,6 @@ class StatusSource(object):
     engine = None
     @staticmethod
     def set_engine():
-        print 'SETTTTTTTTTTING ENGINE!!'
         try:
             dburi = settings.DATABASE_URI
             dbconfig = None
@@ -49,7 +48,6 @@ class StatusSource(object):
             raise e
         except ArgumentError, e:
             raise DbException(e)
-        print StatusSource.engine
 
     @staticmethod
     def table_exists(table_name):
@@ -57,7 +55,6 @@ class StatusSource(object):
             traceback.print_stack()
             raise DbException('engine should be initialized already')
         insp = reflection.Inspector.from_engine(StatusSource.engine)
-        print 'EEEEEEEEEEE', insp.get_table_names()
         return table_name in insp.get_table_names()
     
 
