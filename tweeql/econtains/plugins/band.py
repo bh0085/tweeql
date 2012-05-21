@@ -7,7 +7,7 @@ for all bands matching "name".
 
 from apiclient import discovery
 from apiclient import model
-from everySNAKE.utils import memo as mem
+import json
 DEVELOPER_KEY = 'AIzaSyDGJapkaTMy09-nS96huqzdX4ftUCTJxwA'
 
 def getBandAliases(**kwargs):

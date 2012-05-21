@@ -9,3 +9,4 @@ plugins_enabled = {
     'band':{'getter':getBandAliases,'allowed':None},
     #'bandcollection':{'getter':getBandCollectionAliases,'allowed':allowedBandCollectionNames}
     }
+

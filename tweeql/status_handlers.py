@@ -24,6 +24,7 @@ class PrintStatusHandler(StatusHandler):
 
     def handle_statuses(self, statuses):
         td = self.tuple_descriptor
+    
         for status in statuses:
             vals = (unicode(val) for (alias, val) in status.as_iterable_visible_pairs())     
             #force the stdout to flush so that we can access streams
