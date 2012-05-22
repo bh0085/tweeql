@@ -7,11 +7,11 @@ for all bands matching "name".
 
 from apiclient import discovery
 from apiclient import model
-from everySNAKE.utils import memo as mem
+#from everySNAKE.utils import memo as mem
 DEVELOPER_KEY = 'AIzaSyDGJapkaTMy09-nS96huqzdX4ftUCTJxwA'
-
-def getBandAliases(**kwargs):
-    name = kwargs.get('name')
+import json
+def getBandAliases(name):
+#    name = kwargs.get('name')
     all_aliases = []
     freebase = discovery.build('freebase', 'v1', developerKey=DEVELOPER_KEY)
 
