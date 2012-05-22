@@ -21,6 +21,7 @@ class TwitterFields:
     LANG = "lang"
     CREATED_AT = "created_at"
     PROFILE_IMAGE_URL = "profile_image_url"
+    COORDINATES = "coordinates"
     
 # built here so we can refer to this field in the GroupBy operator. 
 TwitterFields.created_field = FieldDescriptor(TwitterFields.CREATED_AT, [TwitterFields.CREATED_AT], FieldType.FIELD, ReturnType.DATETIME)
@@ -33,6 +34,7 @@ def twitter_tuple_descriptor():
         FieldDescriptor(TwitterFields.PROFILE_IMAGE_URL, [], FieldType.FUNCTION, ReturnType.STRING, None, twitter_user_data_extractor(TwitterFields.PROFILE_IMAGE_URL)),
         FieldDescriptor(TwitterFields.SSQL_USER_ID, [], FieldType.FUNCTION, ReturnType.INTEGER, None, twitter_user_data_extractor(TwitterFields.TWITTER_USER_ID)),
         FieldDescriptor(TwitterFields.SCREEN_NAME, [], FieldType.FUNCTION, ReturnType.STRING, None, twitter_user_data_extractor(TwitterFields.SCREEN_NAME)),
+        FieldDescriptor(TwitterFields.COORDINATES, [TwitterFields.COORDINATES], FieldType.LITERAL, ReturnType.STRING),
         TwitterFields.created_field,
     ]
     return TupleDescriptor(fields)
