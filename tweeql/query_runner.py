@@ -11,9 +11,14 @@ from threading import Thread
 from tweepy import Stream
 from tweepy import StreamListener
 from tweepy.auth import BasicAuthHandler
-from tweeql.saved_stream import SavedStream
+#from tweeql.saved_stream import SavedStream
+from tweeql.stream_from_stream import StreamFromStream, StreamFromDB
+import sys
+import pdb
 
 import time
+from locks import locks
+from tweeql.query import QueryTokens
 
 settings = get_settings()
 
@@ -32,6 +37,9 @@ class QueryRunner(StreamListener):
         self.statuses = []
         self.query_builder = gen_query_builder()
         self.stream = None
+        # initializing database engine - could have done this anywhere. do it here for now
+        StatusSource.set_engine()
+
     def build_stream(self):
         if self.stream != None:
             self.stop_query()
@@ -43,27 +51,30 @@ class QueryRunner(StreamListener):
                              retry_time = 10.0, # wait 10s if no HTTP 200
                              snooze_time = 1.0) # wait 1s if timeout in 600s
     def run_built_query(self, query_built, async):
-        #self.build_stream() FULTON
         self.query = query_built
         self.query.handler.set_tuple_descriptor(self.query.get_tuple_descriptor())
+        
         if self.query.source == StatusSource.TWITTER_FILTER:
-            self.build_stream() #FULTON
+            self.build_stream() 
             no_filter_exception = QueryException("You haven't specified any filters that can query Twitter.  Perhaps you want to query TWITTER_SAMPLE?")
             try:
                 (follow_ids, track_words) = self.query.query_tree.filter_params()
+                sys.stdout.flush()
                 if (follow_ids == None) and (track_words == [None]):
                     raise no_filter_exception
                 self.stream.filter(follow_ids, track_words, async)
             except NotImplementedError:
                 raise no_filter_exception
         elif self.query.source == StatusSource.TWITTER_SAMPLE:
-            self.build_stream() # FULTON
+            self.build_stream() 
             self.stream.sample(None, async)
-        elif StatusSource.has_saved_stream(self.query.source): #FULTON
-            self.stream = SavedStream(self, self.query.source)
-            self.stream.iterate()
+        elif self.query.source.startswith(QueryTokens.TABLE):
+            self.stream = StreamFromDB(self, self.query.source)
+            self.stream.read_from_table(async)
+        elif self.query.source.startswith(QueryTokens.STREAM):
+            self.stream = StreamFromStream(self, self.query.source)
+            self.stream.fetch(async)
     def run_query(self, query_str, async):
-        
         if isinstance(query_str, str):
             query_str = unicode(query_str, 'utf-8')
         query_built = self.query_builder.build(query_str)

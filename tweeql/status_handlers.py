@@ -3,8 +3,12 @@ from tweeql.field_descriptor import ReturnType
 from tweeql.exceptions import SettingsException
 from tweeql.settings_loader import get_settings
 from sqlalchemy import create_engine, Table, Column, Integer, Unicode, Float, DateTime, MetaData
+from sqlalchemy.engine import reflection
 from sqlalchemy.exc import ArgumentError, InterfaceError
 from operators import StatusSource
+import traceback
+
+import pdb
 
 settings = get_settings()
 import sys
@@ -34,30 +38,14 @@ class PrintStatusHandler(StatusHandler):
             sys.stdout.flush()
         
 
+
 class DbInsertStatusHandler(StatusHandler):
-    engine = None
+
 
     def __init__(self, batch_size, tablename):
         super(DbInsertStatusHandler, self).__init__(batch_size)
-        if DbInsertStatusHandler.engine == None:
-            try:
-                dburi = settings.DATABASE_URI
-                dbconfig = None
-                try:
-                    dbconfig = settings.DATABASE_CONFIG
-                except AttributeError:
-                    pass
-                kwargs = {'echo': False}
-                if not dburi.startswith("sqlite"):
-                    kwargs['pool_size'] = 1                    
-                if dbconfig != None:
-                    kwargs['connect_args'] = dbconfig
-                DbInsertStatusHandler.engine = create_engine(dburi, **kwargs)
-            except AttributeError, e:
-                raise e
-                raise SettingsException("To put results INTO a TABLE, please specify a DATABASE_URI in settings.py") 
-            except ArgumentError, e:
-                raise DbException(e)
+        if StatusSource.engine == None:
+            StatusSource.set_engine()
         self.tablename = tablename
 
     def set_tuple_descriptor(self, descriptor):
@@ -71,7 +59,7 @@ class DbInsertStatusHandler(StatusHandler):
         columns.insert(0, Column('__id', Integer, primary_key=True))
         self.table = Table(self.tablename, metadata, *columns)
         try:
-            metadata.create_all(bind=DbInsertStatusHandler.engine)
+            metadata.create_all(bind=StatusSource.engine)
         except InterfaceError:
             raise SettingsException("Unable to connect to database.  Did you configure the connection properly?  Check DATABASE_URI and DATABASE_CONFIG in settings.py") 
 
@@ -101,7 +89,7 @@ class DbInsertStatusHandler(StatusHandler):
             exists and has a different schema.
         """
         metadata = MetaData()
-        metadata.reflect(bind = DbInsertStatusHandler.engine)
+        metadata.reflect(bind = StatusSource.engine)
         mine = str(self.table.columns)
         verified = str(metadata.tables[self.tablename].columns)
         if mine != verified:
@@ -112,20 +100,28 @@ class DbInsertStatusHandler(StatusHandler):
         #now = datetime.now()
         #print "handle called ", now 
         dicts = [dict(status.as_iterable_visible_pairs()) for status in statuses]
-        conn = DbInsertStatusHandler.engine.connect()
+        conn = StatusSource.engine.connect()
         conn.execute(self.table.insert(), dicts)
         conn.close()
-        #print "handle started ", now, " ended ", datetime.now()
 
-class SavedStreamStatusHandler(StatusHandler):
+    
 
-    def __init__(self, batch_size, stream_name):
-        super(SavedStreamStatusHandler, self).__init__(batch_size)
-        self.stream_name = stream_name
-        StatusSource.add_saved_stream(stream_name)
+class ToStreamStatusHandler(StatusHandler):
+
+    def __init__(self, batch_size, name):
+        super(ToStreamStatusHandler, self).__init__(batch_size)
+        self.clients = set()
+        StatusSource.register_saved_stream(name, self)
+    
+    # client is a stream_from_stream
+    def register(self, client):
+        self.clients.add(client)
+
+
+    def unregister(self, client):
+        self.clients.remove(client)
 
     def handle_statuses(self, statuses):
-        # add statuses to the dump in StatusSource
-        for status in statuses:
-            StatusSource.add_tuple_to_saved_stream(status, self.stream_name)
-            
+        for client in self.clients:
+            # send statuses to stream_from_stream
+            client.accept_statuses(statuses)

@@ -260,6 +260,7 @@ class MeanOutliers():
         return mean_group.update_and_calculate(value)
 
 def register_default_functions():
+    
     fr = FunctionRegistry()
     fr.register("temperatureF", FunctionInformation(Temperature.factory, Temperature.return_type))
     fr.register("tweetLatLng", FunctionInformation(Location.factory, Location.return_type))
@@ -267,4 +268,4 @@ def register_default_functions():
     fr.register("strlen", FunctionInformation(StringLength.factory, StringLength.return_type))
     fr.register("meanDevs", FunctionInformation(MeanOutliers.factory, MeanOutliers.return_type))
     fr.register("sentiment", FunctionInformation(Sentiment.factory, Sentiment.return_type))
-
+    
